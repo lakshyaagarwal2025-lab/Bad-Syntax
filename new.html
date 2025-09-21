@@ -1,0 +1,397 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmAssist - Your Digital Farm Helper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .voice-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .listening {
+            background: linear-gradient(45deg, #10b981, #059669);
+            animation: listening-pulse 1s infinite;
+        }
+        
+        @keyframes listening-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.8); }
+        }
+        
+        .shortcut-card {
+            transition: all 0.3s ease;
+        }
+        
+        .shortcut-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow-sm px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-bold text-lg">🌱</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-800">FarmAssist</h1>
+                    <p class="text-sm text-gray-500">Good morning, John!</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <span class="text-yellow-600 text-sm">☀</span>
+                </div>
+                <span class="text-sm text-gray-600">72°F</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Assistant -->
+    <div class="px-4 py-6">
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+            <div class="text-center">
+                <button id="voiceBtn" class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 voice-pulse">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Voice Assistant</h3>
+                <p id="voiceStatus" class="text-gray-600 text-sm mb-4">Tap to ask about weather, crops, or tasks</p>
+                <div id="voiceResponse" class="bg-gray-50 rounded-lg p-3 text-sm text-gray-700 hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Shortcuts -->
+    <div class="px-4">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <!-- Weather Check -->
+            <div class="shortcut-card bg-white rounded-xl p-4 shadow-md cursor-pointer" onclick="checkWeather()">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+                    <span class="text-2xl">🌤</span>
+                </div>
+                <h3 class="font-semibold text-gray-800 text-sm">Weather</h3>
+                <p class="text-xs text-gray-500">7-day forecast</p>
+            </div>
+
+            <!-- Crop Monitor -->
+            <div class="shortcut-card bg-white rounded-xl p-4 shadow-md cursor-pointer" onclick="cropMonitor()">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-3">
+                    <span class="text-2xl">🌾</span>
+                </div>
+                <h3 class="font-semibold text-gray-800 text-sm">Crops</h3>
+                <p class="text-xs text-gray-500">Monitor growth</p>
+            </div>
+
+            <!-- Irrigation -->
+            <div class="shortcut-card bg-white rounded-xl p-4 shadow-md cursor-pointer" onclick="irrigation()">
+                <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-3">
+                    <span class="text-2xl">💧</span>
+                </div>
+                <h3 class="font-semibold text-gray-800 text-sm">Irrigation</h3>
+                <p class="text-xs text-gray-500">Water schedule</p>
+            </div>
+
+            <!-- Market Prices -->
+            <div class="shortcut-card bg-white rounded-xl p-4 shadow-md cursor-pointer" onclick="marketPrices()">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-3">
+                    <span class="text-2xl">💰</span>
+                </div>
+                <h3 class="font-semibold text-gray-800 text-sm">Prices</h3>
+                <p class="text-xs text-gray-500">Market rates</p>
+            </div>
+        </div>
+
+        <!-- Task Management -->
+        <div class="bg-white rounded-xl p-4 shadow-md mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-800">Today's Tasks</h3>
+                <button onclick="addTask()" class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                    <span class="text-white text-lg">+</span>
+                </button>
+            </div>
+            <div id="taskList" class="space-y-3">
+                <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                    <input type="checkbox" class="w-4 h-4 text-green-600 rounded">
+                    <span class="text-sm text-gray-700 flex-1">Check irrigation system - Field A</span>
+                    <span class="text-xs text-gray-500">9:00 AM</span>
+                </div>
+                <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                    <input type="checkbox" class="w-4 h-4 text-green-600 rounded">
+                    <span class="text-sm text-gray-700 flex-1">Apply fertilizer - Corn field</span>
+                    <span class="text-xs text-gray-500">2:00 PM</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="bg-white rounded-lg p-3 text-center shadow-md">
+                <div class="text-lg font-bold text-green-600">85%</div>
+                <div class="text-xs text-gray-500">Soil Moisture</div>
+            </div>
+            <div class="bg-white rounded-lg p-3 text-center shadow-md">
+                <div class="text-lg font-bold text-blue-600">12</div>
+                <div class="text-xs text-gray-500">Active Fields</div>
+            </div>
+            <div class="bg-white rounded-lg p-3 text-center shadow-md">
+                <div class="text-lg font-bold text-yellow-600">$2.45</div>
+                <div class="text-xs text-gray-500">Corn/bushel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for detailed views -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="modalTitle" class="text-lg font-semibold text-gray-800"></h3>
+                    <button onclick="closeModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                        <span class="text-gray-600">×</span>
+                    </button>
+                </div>
+                <div id="modalContent" class="text-gray-600"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isListening = false;
+        let recognition;
+
+        // Initialize speech recognition if available
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById('voiceBtn').classList.add('listening');
+                document.getElementById('voiceStatus').textContent = 'Listening... Speak now!';
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                handleVoiceCommand(transcript);
+            };
+
+            recognition.onend = function() {
+                isListening = false;
+                document.getElementById('voiceBtn').classList.remove('listening');
+                document.getElementById('voiceStatus').textContent = 'Tap to ask about weather, crops, or tasks';
+            };
+
+            recognition.onerror = function(event) {
+                isListening = false;
+                document.getElementById('voiceBtn').classList.remove('listening');
+                document.getElementById('voiceStatus').textContent = 'Sorry, I couldn\'t hear you. Try again!';
+            };
+        }
+
+        // Voice assistant functionality
+        document.getElementById('voiceBtn').addEventListener('click', function() {
+            if (recognition) {
+                if (!isListening) {
+                    recognition.start();
+                } else {
+                    recognition.stop();
+                }
+            } else {
+                // Fallback for browsers without speech recognition
+                document.getElementById('voiceStatus').textContent = 'Voice recognition not supported in this browser';
+                setTimeout(() => {
+                    document.getElementById('voiceStatus').textContent = 'Tap to ask about weather, crops, or tasks';
+                }, 3000);
+            }
+        });
+
+        function handleVoiceCommand(command) {
+            const responseDiv = document.getElementById('voiceResponse');
+            responseDiv.classList.remove('hidden');
+            
+            if (command.includes('weather')) {
+                responseDiv.innerHTML = '🌤 Today: Sunny, 72°F. Tomorrow: Partly cloudy, 68°F. Good conditions for fieldwork!';
+            } else if (command.includes('crop') || command.includes('plant')) {
+                responseDiv.innerHTML = '🌾 Corn is at 65% maturity. Soybeans looking healthy. Consider harvesting corn in 2-3 weeks.';
+            } else if (command.includes('water') || command.includes('irrigation')) {
+                responseDiv.innerHTML = '💧 Soil moisture at 85%. Next irrigation scheduled for Field B tomorrow at 6 AM.';
+            } else if (command.includes('price') || command.includes('market')) {
+                responseDiv.innerHTML = '💰 Current prices: Corn $2.45/bushel (↑2%), Soybeans $5.12/bushel (↓1%). Good selling opportunity for corn!';
+            } else if (command.includes('task')) {
+                responseDiv.innerHTML = '📋 You have 2 tasks today: Check irrigation at 9 AM and apply fertilizer at 2 PM.';
+            } else {
+                responseDiv.innerHTML = '🤔 I can help with weather, crops, irrigation, prices, and tasks. What would you like to know?';
+            }
+        }
+
+        // Shortcut functions
+        function checkWeather() {
+            showModal('Weather Forecast', `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <div>
+                            <div class="font-semibold">Today</div>
+                            <div class="text-sm text-gray-600">Sunny</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-blue-600">72°F</div>
+                            <div class="text-sm">☀</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <div class="font-semibold">Tomorrow</div>
+                            <div class="text-sm text-gray-600">Partly Cloudy</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold">68°F</div>
+                            <div class="text-sm">⛅</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <div class="text-sm font-semibold text-green-800">Farm Tip</div>
+                        <div class="text-sm text-green-700">Perfect conditions for fieldwork this week!</div>
+                    </div>
+                </div>
+            `);
+        }
+
+        function cropMonitor() {
+            showModal('Crop Status', `
+                <div class="space-y-3">
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">🌽 Corn - Field A</div>
+                                <div class="text-sm text-gray-600">65% Maturity</div>
+                            </div>
+                            <div class="text-green-600 font-bold">Healthy</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-yellow-50 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">🫘 Soybeans - Field B</div>
+                                <div class="text-sm text-gray-600">45% Maturity</div>
+                            </div>
+                            <div class="text-yellow-600 font-bold">Monitor</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <div class="text-sm font-semibold text-blue-800">Recommendation</div>
+                        <div class="text-sm text-blue-700">Consider harvesting corn in 2-3 weeks</div>
+                    </div>
+                </div>
+            `);
+        }
+
+        function irrigation() {
+            showModal('Irrigation Schedule', `
+                <div class="space-y-3">
+                    <div class="p-3 bg-cyan-50 rounded-lg">
+                        <div class="font-semibold mb-2">💧 Today's Schedule</div>
+                        <div class="text-sm space-y-1">
+                            <div>Field A: Completed ✅</div>
+                            <div>Field B: 6:00 PM</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <div class="font-semibold mb-2">📊 Soil Moisture</div>
+                        <div class="text-sm space-y-1">
+                            <div>Field A: 85% 🟢</div>
+                            <div>Field B: 72% 🟡</div>
+                            <div>Field C: 91% 🟢</div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+
+        function marketPrices() {
+            showModal('Market Prices', `
+                <div class="space-y-3">
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">🌽 Corn</div>
+                                <div class="text-sm text-gray-600">per bushel</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-green-600">$2.45</div>
+                                <div class="text-sm text-green-600">↑ 2%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-red-50 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">🫘 Soybeans</div>
+                                <div class="text-sm text-gray-600">per bushel</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-red-600">$5.12</div>
+                                <div class="text-sm text-red-600">↓ 1%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <div class="text-sm font-semibold text-blue-800">Market Insight</div>
+                        <div class="text-sm text-blue-700">Good time to sell corn - prices trending up!</div>
+                    </div>
+                </div>
+            `);
+        }
+
+        function addTask() {
+            const taskList = document.getElementById('taskList');
+            const newTask = document.createElement('div');
+            newTask.className = 'flex items-center space-x-3 p-2 bg-gray-50 rounded-lg';
+            newTask.innerHTML = `
+                <input type="checkbox" class="w-4 h-4 text-green-600 rounded">
+                <span class="text-sm text-gray-700 flex-1">New task - Tap to edit</span>
+                <span class="text-xs text-gray-500">Now</span>
+            `;
+            taskList.appendChild(newTask);
+        }
+
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9828f11b41bbc784',t:'MTc1ODQ1MTE5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
